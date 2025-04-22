@@ -1,11 +1,12 @@
 import os
 import random
 import sys
+import time
 
-from pytimedinput import timedKey
+from blessed import Terminal
 
 from apple import Apple
-from consts import COLS, ROWS
+from consts import COLS, ROWS, FPS
 from snake import Snake
 
 
@@ -15,23 +16,26 @@ def random_position():
 
 class GameEngine:
     def __init__(self):
+        self.running = True
+        self.term = Terminal()
+
         self.snake = Snake()
         self.apple = Apple(random_position())
         self.field = [[" "] * COLS for _ in range(ROWS)]
 
     def print_field(self):
-        for i in range(COLS + 2):
-            print("#", end="")
-        print()
+        print('#'*(COLS + 2))
         for i in range(ROWS):
             print("#", end="")
             for j in range(COLS):
                 print(self.field[i][j], end="")
             print("#", end="")
             print()
-        for i in range(COLS + 2):
-            print("#", end="")
-        print()
+
+        print('#'*(COLS + 2))
+
+    def clear_field(self):
+        print(self.term.clear)
 
     def update_field(self):
         for i in range(ROWS):
@@ -48,18 +52,6 @@ class GameEngine:
         print(self.apple[0], self.apple[1])
         self.field[self.apple[0]][self.apple[1]] = "a"
 
-    def on_move_keys(self, event):
-        if event.name == "w":
-            self.snake.set_direction("w")
-        elif event.name == "s":
-            self.snake.set_direction("s")
-        elif event.name == "a":
-            self.snake.set_direction("a")
-        elif event.name == "d":
-            self.snake.set_direction("d")
-        elif event.name == "esc":
-            sys.exit(0)
-
     def check_collision(self):
         if self.snake[0][0] < 0 or self.snake[0][0] >= ROWS or self.snake[0][1] < 0 or self.snake[0][1] >= COLS:
             return True
@@ -75,29 +67,41 @@ class GameEngine:
             self.apple.position = random_position()
             self.snake.new_block = True
 
-    def run(self):
-        while True:
-            os.system("cls")
+    def handle_input(self):
+        key = self.term.inkey(timeout=0)
 
-            self.print_field()
-
-            txt, _ = timedKey("", timeout=0.15, resetOnInput=True, allowCharacters="wasd")
-            match txt:
-                case "w":
-                    self.snake.set_direction("w")
-                case "s":
-                    self.snake.set_direction("s")
-                case "a":
-                    self.snake.set_direction("a")
-                case "d":
-                    self.snake.set_direction("d")
-                case "q":
-                    sys.exit(0)
-
-            self.snake.move()
-            self.update_field()
-            self.check_apple()
-            if self.check_collision():
-                print("Game over")
+        match key.lower():
+            case "w":
+                self.snake.set_direction("w")
+            case "s":
+                self.snake.set_direction("s")
+            case "a":
+                self.snake.set_direction("a")
+            case "d":
+                self.snake.set_direction("d")
+            case "q":
                 sys.exit(0)
-            # time.sleep(0.15)
+
+    def run(self):
+        with self.term.fullscreen(), self.term.cbreak():
+            while self.running:
+
+                current_time = time.time()
+
+                self.handle_input()
+
+                self.snake.move()
+                self.update_field()
+                self.check_apple()
+                if self.check_collision():
+                    print("Game over")
+                    self.running = False
+
+                self.clear_field()
+
+                self.print_field()
+
+                last_frame_time = time.time()
+                sleep_time = 1. / FPS - (current_time - last_frame_time)
+                if sleep_time > 0:
+                    time.sleep(sleep_time)
