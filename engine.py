@@ -1,4 +1,3 @@
-import os
 import random
 import sys
 import time
@@ -6,12 +5,12 @@ import time
 from blessed import Terminal
 
 from apple import Apple
-from consts import COLS, ROWS, FPS
+from consts import FPS
 from snake import Snake
 
 
-def random_position():
-    return random.randint(0, ROWS - 1), random.randint(0, COLS - 1)
+def random_position(x_bounds, y_bounds):
+    return random.randint(0, x_bounds - 1), random.randint(0, y_bounds - 1)
 
 
 class GameEngine:
@@ -19,53 +18,47 @@ class GameEngine:
         self.running = True
         self.term = Terminal()
 
-        self.snake = Snake()
-        self.apple = Apple(random_position())
-        self.field = [[" "] * COLS for _ in range(ROWS)]
+        width, height = self.term.width, self.term.height
+        self.snake = Snake((width, height))
+        self.apple = Apple(random_position(width, height))
 
     def print_field(self):
-        print('#'*(COLS + 2))
-        for i in range(ROWS):
-            print("#", end="")
-            for j in range(COLS):
-                print(self.field[i][j], end="")
-            print("#", end="")
-            print()
+        snake_head = self.snake.head
+        snake_body = self.snake.body
 
-        print('#'*(COLS + 2))
+        apple = self.apple.position
+
+        with self.term.location(0, 0):
+            print(self.term.move_xy(snake_head[0], snake_head[1]) + "H", end="")
+
+            for segment in snake_body:
+                print(self.term.move_xy(segment[0], segment[1]) + "X", end="")
+
+            print(self.term.move_xy(apple[0], apple[1]) + "a", end="")
+
+            segment_to_remove = self.snake.block_to_remove
+            if segment_to_remove:
+                print(self.term.move_xy(segment_to_remove[0], segment_to_remove[1]) + " ", end="")
+                self.snake.block_to_remove = None
+
+            print('', end="", flush=True)
 
     def clear_field(self):
         print(self.term.clear)
 
-    def update_field(self):
-        for i in range(ROWS):
-            for j in range(COLS):
-                if self.field[i][j] == "X":
-                    self.field[i][j] = " "
-
-        for i in range(len(self.snake)):
-            if i == 0:
-                self.field[self.snake[i][0]][self.snake[i][1]] = "H"
-            else:
-                self.field[self.snake[i][0]][self.snake[i][1]] = "X"
-
-        print(self.apple[0], self.apple[1])
-        self.field[self.apple[0]][self.apple[1]] = "a"
-
     def check_collision(self):
-        if self.snake[0][0] < 0 or self.snake[0][0] >= ROWS or self.snake[0][1] < 0 or self.snake[0][1] >= COLS:
+        if self.snake.is_out_of_bounds():
             return True
 
-        for i in range(1, len(self.snake)):
-            if self.snake[0] == self.snake[i]:
-                return True
+        if self.snake.is_collision():
+            return True
 
         return False
 
     def check_apple(self):
-        if self.snake[0] == self.apple.position:
-            self.apple.position = random_position()
-            self.snake.new_block = True
+        if self.snake.head == self.apple.position:
+            self.apple.position = random_position(self.term.width, self.term.height)
+            self.snake._new_block = True
 
     def handle_input(self):
         key = self.term.inkey(timeout=0)
@@ -83,7 +76,13 @@ class GameEngine:
                 sys.exit(0)
 
     def run(self):
-        with self.term.fullscreen(), self.term.cbreak():
+        with self.term.fullscreen(), self.term.cbreak(), self.term.hidden_cursor(), self.term.location():
+        # with self.term.cbreak(), self.term.hidden_cursor(), self.term.location():
+
+            # print(self.term.on_blue(self.term.clear))
+
+            self.print_field()
+
             while self.running:
 
                 current_time = time.time()
@@ -91,13 +90,10 @@ class GameEngine:
                 self.handle_input()
 
                 self.snake.move()
-                self.update_field()
                 self.check_apple()
-                if self.check_collision():
+                if self.check_collision(): # TODO: check before moving
                     print("Game over")
                     self.running = False
-
-                self.clear_field()
 
                 self.print_field()
 
@@ -105,3 +101,5 @@ class GameEngine:
                 sleep_time = 1. / FPS - (current_time - last_frame_time)
                 if sleep_time > 0:
                     time.sleep(sleep_time)
+
+            time.sleep(2)

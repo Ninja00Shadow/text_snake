@@ -1,4 +1,1 @@
-FPS = 6
-
-ROWS = 16
-COLS = 32
+FPS = 8
