@@ -66,15 +66,29 @@ class Snake:
 
     def set_direction(self, direction_vector):
         last_vector_direction = (0, 0)
+        dx, dy = self._direction
+        if dx != 0:
+            last_vector_direction = (1 if dx > 0 else -1, 0)
+        if dy != 0:
+            last_vector_direction = (last_vector_direction[0],
+                                     1 if dy > 0 else -1)
 
-        if self._direction[0] != 0:
-            last_vector_direction = (1 if self._direction[0] > 0 else -1, 0)
-        if self._direction[1] != 0:
-            last_vector_direction = (last_vector_direction[0], 1 if self._direction[1] > 0 else -1)
+        if direction_vector == last_vector_direction:
+            self._direction = (dx + direction_vector[0], dy + direction_vector[1])
+            return
 
-        if last_vector_direction == direction_vector:
-            self._direction = (self._direction[0] + direction_vector[0], self._direction[1] + direction_vector[1])
-        elif (self.head[0] + direction_vector[0], self.head[1] + direction_vector[1]) not in self._body:
+        if last_vector_direction != (0, 0):
+            opp_x = direction_vector[0] == -last_vector_direction[0]
+            opp_y = direction_vector[1] == -last_vector_direction[1]
+            if opp_x or opp_y:
+                new_dx = dx + direction_vector[0]
+                new_dy = dy + direction_vector[1]
+                if (new_dx, new_dy) != (0, 0):
+                    self._direction = (new_dx, new_dy)
+                return
+
+        next_head = (self.head[0] + direction_vector[0], self.head[1] + direction_vector[1])
+        if next_head not in self._body:
             self._direction = direction_vector
 
     def is_head(self, position):
@@ -84,7 +98,8 @@ class Snake:
         return position in self._body[1:]
 
     def is_out_of_bounds(self):
-        return self.head[0] < 0 or self.head[0] >= self._boundaries[0] or self.head[1] < 0 or self.head[1] >= self._boundaries[1]
+        return self.head[0] < 0 or self.head[0] >= self._boundaries[0] or self.head[1] < 0 or self.head[1] >= \
+            self._boundaries[1]
 
     def is_collision(self):
         return self.head in self.body

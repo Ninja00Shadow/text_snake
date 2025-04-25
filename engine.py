@@ -19,8 +19,8 @@ class GameEngine:
         self.term = Terminal()
 
         width, height = self.term.width, self.term.height
-        self.snake = Snake((width, height))
-        self.apple = Apple(random_position(width, height))
+        self.snake = Snake((width - 1, height - 1))
+        self.apple = Apple(random_position(width - 1, height - 1))
 
     def print_field(self):
         snake_head = self.snake.head
@@ -57,7 +57,7 @@ class GameEngine:
 
     def check_apple(self):
         if self.snake.head == self.apple.position:
-            self.apple.position = random_position(self.term.width, self.term.height)
+            self.apple.position = random_position(self.term.width - 1, self.term.height - 1)
             self.snake._new_block = True
 
     def handle_input(self):
@@ -79,7 +79,7 @@ class GameEngine:
         with self.term.fullscreen(), self.term.cbreak(), self.term.hidden_cursor(), self.term.location():
         # with self.term.cbreak(), self.term.hidden_cursor(), self.term.location():
 
-            # print(self.term.on_blue(self.term.clear))
+            print(self.term.on_blue(self.term.clear))
 
             self.print_field()
 
