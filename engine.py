@@ -65,13 +65,13 @@ class GameEngine:
 
         match key.lower():
             case "w":
-                self.snake.set_direction("w")
+                self.snake.set_direction((0, -1))
             case "s":
-                self.snake.set_direction("s")
+                self.snake.set_direction((0, 1))
             case "a":
-                self.snake.set_direction("a")
+                self.snake.set_direction((-1, 0))
             case "d":
-                self.snake.set_direction("d")
+                self.snake.set_direction((1, 0))
             case "q":
                 sys.exit(0)
 
@@ -82,6 +82,8 @@ class GameEngine:
             # print(self.term.on_blue(self.term.clear))
 
             self.print_field()
+
+            print(self.term.move_xy(0, self.term.height) + self.term.on_blue("Press 'q' to quit"), end="")
 
             while self.running:
 

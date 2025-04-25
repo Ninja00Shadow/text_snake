@@ -64,15 +64,18 @@ class Snake:
         else:
             pass
 
-    def set_direction(self, direction): # maybe double tap for higher speed
-        if direction == "w" and self._direction != (0, -1):
-            self._direction = (0, -1)
-        elif direction == "s" and self._direction != (0, 1):
-            self._direction = (0, 1)
-        elif direction == "a" and self._direction != (-1, 0):
-            self._direction = (-1, 0)
-        elif direction == "d" and self._direction != (1, 0):
-            self._direction = (1, 0)
+    def set_direction(self, direction_vector):
+        last_vector_direction = (0, 0)
+
+        if self._direction[0] != 0:
+            last_vector_direction = (1 if self._direction[0] > 0 else -1, 0)
+        if self._direction[1] != 0:
+            last_vector_direction = (last_vector_direction[0], 1 if self._direction[1] > 0 else -1)
+
+        if last_vector_direction == direction_vector:
+            self._direction = (self._direction[0] + direction_vector[0], self._direction[1] + direction_vector[1])
+        elif (self.head[0] + direction_vector[0], self.head[1] + direction_vector[1]) not in self._body:
+            self._direction = direction_vector
 
     def is_head(self, position):
         return self._body[0] == position
