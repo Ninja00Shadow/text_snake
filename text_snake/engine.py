@@ -4,9 +4,9 @@ import time
 
 from blessed import Terminal
 
-from apple import Apple
-from consts import FPS
-from snake import Snake
+from .apple import Apple
+from .consts import FPS
+from .snake import Snake
 
 
 def random_position(x_bounds, y_bounds):
