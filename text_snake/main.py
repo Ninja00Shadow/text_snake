@@ -1,4 +1,4 @@
-from .engine import GameEngine
+from text_snake.engine import GameEngine
 
 def main():
     game = GameEngine()
