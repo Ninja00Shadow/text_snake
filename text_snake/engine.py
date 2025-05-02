@@ -1,12 +1,10 @@
 import random
-import signal
 import sys
 import time
 
 from blessed import Terminal
 
 from .apple import Apple
-from .consts import FPS
 from .snake import Snake
 
 
@@ -15,7 +13,9 @@ def random_position(x_bounds, y_bounds):
 
 
 class GameEngine:
-    def __init__(self):
+    def __init__(self, fps=30):
+        self.fps = fps
+
         self.running = True
         self.term = Terminal()
 
@@ -31,8 +31,6 @@ class GameEngine:
         apple = self.apple.position
 
         with self.term.location(0, 0):
-            print(self.term.move_xy(snake_head[0], snake_head[1]) + self.term.on_darkolivegreen(" "), end="")
-
             for segment in snake_body:
                 print(self.term.move_xy(segment[0], segment[1]) + self.term.on_darkolivegreen(" "), end="")
 
@@ -42,6 +40,14 @@ class GameEngine:
             if segment_to_remove:
                 print(self.term.move_xy(segment_to_remove[0], segment_to_remove[1]) + self.term.on_lawngreen(" "), end="")
                 self.snake.block_to_remove = None
+
+            head = ""
+            direction = self.snake.direction
+            if direction == (1, 0) or direction == (-1, 0):
+                head = ":"
+            elif direction == (0, 1) or direction == (0, -1):
+                head = "\""
+            print(self.term.move_xy(snake_head[0], snake_head[1]) + self.term.on_darkolivegreen(head), end="")
 
     def clear_field(self):
         print(self.term.on_lawngreen(self.term.clear))
@@ -76,6 +82,8 @@ class GameEngine:
                 sys.exit(0)
 
     def run(self):
+        even_frame = True
+
         with self.term.fullscreen(), self.term.cbreak(), self.term.hidden_cursor(), self.term.location():
         # with self.term.cbreak(), self.term.hidden_cursor(), self.term.location():
 
@@ -89,7 +97,14 @@ class GameEngine:
 
                 self.handle_input()
 
-                self.snake.move()
+                if self.snake.direction == (0, 1) or self.snake.direction == (0, -1):
+                    if even_frame:
+                        self.snake.move()
+
+                    even_frame = not even_frame
+                else:
+                    self.snake.move()
+
                 self.check_apple()
                 if self.check_collision():
                     print(self.term.move_xy(0, self.term.height) + self.term.on_red("Game over"), end="")
@@ -98,7 +113,7 @@ class GameEngine:
                 self.print_field()
 
                 last_frame_time = time.time()
-                sleep_time = 1. / FPS - (current_time - last_frame_time)
+                sleep_time = 1. / self.fps - (current_time - last_frame_time)
                 if sleep_time > 0:
                     time.sleep(sleep_time)
 

@@ -20,6 +20,12 @@ class Snake:
     def body(self):
         return self._body[1:]
 
+    @property
+    def direction(self):
+        if self._direction == (0, 0):
+            return self.head[0] - self.body[0][0], self.head[1] - self.body[0][1]
+        return self._direction
+
     def generate_head(self):
         x = random.randint(int(self._boundaries[0] / 4), int(self._boundaries[0] * 3 / 4))
         y = random.randint(int(self._boundaries[1] / 4), int(self._boundaries[1] * 3 / 4))
