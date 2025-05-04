@@ -5,6 +5,7 @@ import time
 from blessed import Terminal
 
 from .apple import Apple
+from .scores import update_scores
 from .snake import Snake
 
 
@@ -17,6 +18,8 @@ class GameEngine:
         self.fps = fps
 
         self.running = True
+        self.score = 0
+
         self.term = Terminal()
 
         self.width = self.term.width
@@ -66,6 +69,8 @@ class GameEngine:
             self.apple.position = random_position(self.width - 1, self.height - 1)
             self.snake._new_block = True
 
+            self.score += 1
+
     def handle_input(self):
         key = self.term.inkey(timeout=0)
 
@@ -80,6 +85,12 @@ class GameEngine:
                 self.snake.set_direction((1, 0))
             case "q":
                 sys.exit(0)
+
+    def game_over(self):
+        print(self.term.move_xy(0, self.term.height) + self.term.on_red("Game over"), end="")
+        self.running = False
+
+        update_scores(self.score)
 
     def run(self):
         even_frame = True
@@ -107,8 +118,7 @@ class GameEngine:
 
                 self.check_apple()
                 if self.check_collision():
-                    print(self.term.move_xy(0, self.term.height) + self.term.on_red("Game over"), end="")
-                    self.running = False
+                    self.game_over()
 
                 self.print_field()
 

@@ -1,6 +1,7 @@
 import argparse
 
 from text_snake.engine import GameEngine
+from text_snake.scores import display_scores, clear_scores
 
 
 def parse_args():
@@ -19,21 +20,18 @@ def parse_args():
 
     scores_parser = subparsers.add_parser(
         "scores",
-        help="Manage game scores"
+        help="Manage game scores",
+        description="Manage game scores. Without arguments, it will display the scores.",
     )
 
     scores_parser.add_argument(
-        "--list",
-        action="store_false",
-        help="List all scores"
+        "-c",
+        "--clear",
+        action="store_true",
+        help="Clear all scores"
     )
 
     return parser.parse_args()
-
-
-def scores_list():
-    print("=== High Scores ===")
-    return
 
 
 def start_game(args):
@@ -44,8 +42,11 @@ def start_game(args):
 def main():
     args = parse_args()
 
-    if args.command == "scores" and args.list:
-        scores_list()
+    if args.command == "scores" and not args.clear:
+        display_scores()
+        return
+    if args.command == "scores" and args.clear:
+        clear_scores()
         return
 
     start_game(args)
