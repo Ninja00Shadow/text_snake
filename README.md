@@ -40,7 +40,7 @@ snake scores          # print the current high‑score table
 ```
 
 ## Controls
-- `Arrow keys` to control the snake
+- `WASD keys` to control the snake
 - `q` to quit the game
 
 ## More config options
