@@ -1,6 +1,8 @@
 # text-snake
 
-![](docs/demo.gif)
+<p align="center">
+  <img width="600" height="384" src="docs/demo.gif">
+</p>
 
 text-snake is a simple console-based snake game in Python. It's designed to be playable on a broad range of terminals, including Windows, Linux, and MacOS. 
 The game is built using the `blessed` library, which provides a high-level interface for handling terminal graphics and input.
