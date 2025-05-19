@@ -12,10 +12,18 @@ def parse_args():
         description="Console version of the Snake game",
     )
     parser.add_argument(
+        "-s",
         "--speed",
         type=int,
         default=defaults["speed"],
         help="Game speed (default: 30)",
+    )
+    parser.add_argument(
+        "-l",
+        "--length",
+        type=int,
+        default=defaults["length"],
+        help="Snake length (default: 5)",
     )
 
     subparsers = parser.add_subparsers(title="commands", dest="command")
@@ -32,13 +40,13 @@ def parse_args():
         action="store_true",
         help="Clear all scores"
     )
-    # scores_parser.add_argument(
-    #     "-n",
-    #     "--number",
-    #     type=int,
-    #     default=10,
-    #     help="Number of stored scores (default: 10)"
-    # )
+    scores_parser.add_argument(
+        "-n",
+        "--number",
+        type=int,
+        default=10,
+        help="Number of stored scores (default: 10)"
+    )
 
     defaults_parser = subparsers.add_parser(
         "defaults",
@@ -52,18 +60,18 @@ def parse_args():
         type=int,
         help="Set the default game speed (min: 1)",
     )
-    # defaults_parser.add_argument(
-    #     "-l",
-    #     "--length",
-    #     type=int,
-    #     help="Set the default snake length (min: 1)",
-    # )
+    defaults_parser.add_argument(
+        "-l",
+        "--length",
+        type=int,
+        help="Set the default snake length (min: 1)",
+    )
 
     return parser.parse_args()
 
 
 def start_game(args):
-    game = GameEngine(fps=args.speed)
+    game = GameEngine(fps=args.speed, length=args.length)
     game.run()
 
 def handle_defaults(args):
