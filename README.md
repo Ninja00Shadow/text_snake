@@ -16,20 +16,16 @@ The game is built using the `blessed` library, which provides a high-level inter
 
 ## Installation
 
-PyPI
+Installation by pip
 ```bash
-pip install text-snake
+git clone https://github.com/Ninja00Shadow/text_snake.git
+cd text_snake
+pip install .
 ```
 
 Pipx
 ```bash
-pipx git+https://github.com/Ninja00Shadow/text_snake.git
-```
-
-You can also clone the repository and run the game directly from the source code. Make sure you have Python 3.x installed.
-
-```bash
-
+pipx install git+https://github.com/Ninja00Shadow/text_snake.git
 ```
 
 ## Quick start
