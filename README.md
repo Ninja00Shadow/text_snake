@@ -11,7 +11,7 @@ The game is built using the `blessed` library, which provides a high-level inter
 
 * **Cross‑platform** – tested on Windows and Ubuntu
 * **Fullscreen** – runs in a terminal window, no GUI required
-* **Adjustable speed** – FPS from slow to frantic
+* **Adjustable** – change the speed, length, and other parameters
 * **High‑scores** – top 10 stored locally
 
 ## Installation
@@ -35,8 +35,8 @@ You can also clone the repository and run the game directly from the source code
 ## Quick start
 ```bash
 snake                 # start the game
-snake --speed 20      # slower snake (20 FPS)
 snake scores          # print the current high‑score table
+snake defaults        # change the default values (speed, length, etc.)
 ```
 
 ## Controls
