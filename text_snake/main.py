@@ -16,7 +16,7 @@ def parse_args():
         "--speed",
         type=int,
         default=defaults["speed"],
-        help="Game speed (default: 30)",
+        help="Game speed (default: 20)",
     )
     parser.add_argument(
         "-l",

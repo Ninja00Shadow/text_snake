@@ -13,7 +13,7 @@ def read_defaults():
                 defaults[key] = int(value)
     except FileNotFoundError:
         defaults = {
-            "speed": 30,
+            "speed": 20,
             "length": 3
         }
         write_defaults(defaults)
