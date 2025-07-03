@@ -95,6 +95,10 @@ class GameEngine:
     def restart(self):
         self.running = True
         self.score = 0
+
+        self.width = self.term.width
+        self.height = self.term.height
+
         self.snake = Snake(self.start_length, (self.width, self.height))
         self.apple = Apple(random_position(self.width - 1, self.height - 1))
         self.clear_field()
