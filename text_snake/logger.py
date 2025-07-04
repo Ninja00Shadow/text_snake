@@ -1,6 +1,5 @@
 import logging
 import pathlib
-import sys
 
 LOG_DIR = pathlib.Path(__file__).parent / "logs"
 LOG_DIR.mkdir(exist_ok=True)

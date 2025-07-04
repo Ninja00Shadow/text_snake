@@ -1,5 +1,6 @@
 import argparse
 
+from text_snake.logger import logger
 from text_snake.defaults import read_defaults, write_defaults
 from text_snake.engine import GameEngine
 from text_snake.scores import display_scores, clear_scores
@@ -25,6 +26,13 @@ def parse_args():
         default=defaults["length"],
         help="Snake length (default: 5)",
     )
+    parser.add_argument(
+        "-v",
+        "--vertical",
+        type=float,
+        default=1.0,
+        help="Vertical speed multiplier (default: 1.0) (range: 0.1 to 1.0)",
+    )
 
     subparsers = parser.add_subparsers(title="commands", dest="command")
 
@@ -40,13 +48,13 @@ def parse_args():
         action="store_true",
         help="Clear all scores"
     )
-    scores_parser.add_argument(
-        "-n",
-        "--number",
-        type=int,
-        default=10,
-        help="Number of stored scores (default: 10)"
-    )
+    # scores_parser.add_argument(
+    #     "-n",
+    #     "--number",
+    #     type=int,
+    #     default=10,
+    #     help="Number of stored scores (default: 10)"
+    # )
 
     defaults_parser = subparsers.add_parser(
         "defaults",
@@ -71,7 +79,16 @@ def parse_args():
 
 
 def start_game(args):
-    game = GameEngine(fps=args.speed, length=args.length)
+    if args.vertical < 0.1 or args.vertical > 1.0:
+        print("Vertical speed multiplier must be between 0.1 and 1.0.")
+        return
+    if args.speed < 1:
+        print("Speed must be at least 1.")
+        return
+    if args.length < 2:
+        print("Length must be at least 2.")
+        return
+    game = GameEngine(fps=args.speed, length=args.length, vertical=args.vertical)
     game.run()
 
 def handle_defaults(args):
@@ -87,8 +104,8 @@ def handle_defaults(args):
             return
         defaults["speed"] = args.speed
     if args.length is not None:
-        if args.length < 1:
-            print("Length must be at least 1.")
+        if args.length < 2:
+            print("Length must be at least 2.")
             return
         defaults["length"] = args.length
 

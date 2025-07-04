@@ -1,5 +1,15 @@
 class Vector:
+    """
+    A class representing a 2D vector with basic operations.
+    It supports initialization with either a tuple or two separate arguments,
+    and provides methods for inverting the vector, checking if it is horizontal or vertical,
+    and comparing vectors for equality.
+    """
     def __init__(self, *args):
+        """
+        Initializes the vector with either a tuple (x, y) or two separate arguments.
+        :param args:
+        """
         if len(args) == 1:
             if isinstance(args[0], tuple):
                 x, y = args[0]

@@ -24,7 +24,7 @@ def random_position(x_bounds, y_bounds):
 
 
 class GameEngine:
-    def __init__(self, fps=20, length=5):
+    def __init__(self, fps=20, length=5, vertical=1.0):
         self.fps = fps
 
         self.running = True
@@ -37,6 +37,9 @@ class GameEngine:
         self.height = self.term.height
         self.snake = Snake(length, (self.width, self.height))
         self.apple = Apple(random_position(self.width - 1, self.height - 1))
+
+        self.vertical = False
+        self.vertical_multiplier = vertical
 
     def print_field(self):
         snake_head = self.snake.head
@@ -90,7 +93,12 @@ class GameEngine:
             self.running = False
 
         v = key_map.get(key.lower())
-        if v: self.snake.set_direction(v)
+        if v:
+            self.snake.set_direction(v)
+            if self.snake.direction.is_vertical():
+                self.vertical = True
+            else:
+                self.vertical = False
 
     def restart(self):
         self.running = True
@@ -108,10 +116,10 @@ class GameEngine:
         end_message = ("Game over!", f"Score: {self.score}", f"Restart: r", f"Quit: q")
 
         print(self.term.move_xy(0, self.term.height // 2 - 3))
-        print(self.term.center("#"*15))
+        print(self.term.center("#" * 15))
         for line in end_message:
             print(self.term.center("# {:<11} #".format(line)))
-        print(self.term.center("#"*15))
+        print(self.term.center("#" * 15))
 
         sys.stdout.flush()
         self.running = False
@@ -148,7 +156,8 @@ class GameEngine:
                 else:
                     self.print_field()
 
-                frame_duration = 1. / self.fps
+                frame_duration = 1. / (max(self.fps, 1) * (self.vertical_multiplier if self.vertical else 1.0))
+                logger.debug(f"Frame duration: {frame_duration:.3f} seconds, direction: {self.snake.direction}")
                 elapsed = time.time() - current_time
                 time_to_sleep = max(frame_duration - elapsed, 0)
                 time.sleep(time_to_sleep)
