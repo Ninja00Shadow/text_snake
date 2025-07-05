@@ -7,6 +7,7 @@ from blessed import Terminal
 from .animations import box_collapse
 from .logger import logger
 from .apple import Apple
+from .position import Position
 from .scores import update_scores
 from .snake import Snake
 from .vector import Vector
@@ -20,7 +21,7 @@ key_map = {
 
 
 def random_position(x_bounds, y_bounds):
-    return random.randint(0, x_bounds - 1), random.randint(0, y_bounds - 1)
+    return Position(random.randint(0, x_bounds - 1), random.randint(0, y_bounds - 1))
 
 
 class GameEngine:
@@ -36,7 +37,7 @@ class GameEngine:
         self.width = self.term.width
         self.height = self.term.height
         self.snake = Snake(length, (self.width, self.height))
-        self.apple = Apple(random_position(self.width - 1, self.height - 1))
+        self.apple = Apple(self.generate_correct_apple_position())
 
         self.vertical = False
         self.vertical_multiplier = vertical
@@ -49,13 +50,13 @@ class GameEngine:
 
         with self.term.location(0, 0):
             for segment in snake_body:
-                print(self.term.move_xy(segment[0], segment[1]) + self.term.on_darkolivegreen(" "), end="")
+                print(self.term.move_xy(segment.x, segment.y) + self.term.on_darkolivegreen(" "), end="")
 
-            print(self.term.move_xy(apple[0], apple[1]) + self.term.on_red(" "), end="")
+            print(self.term.move_xy(apple.x, apple.y) + self.term.on_red(" "), end="")
 
             segment_to_remove = self.snake.block_to_remove
             if segment_to_remove:
-                print(self.term.move_xy(segment_to_remove[0], segment_to_remove[1]) + self.term.on_lawngreen(" "),
+                print(self.term.move_xy(segment_to_remove.x, segment_to_remove.y) + self.term.on_lawngreen(" "),
                       end="")
                 self.snake.block_to_remove = None
 
@@ -65,7 +66,7 @@ class GameEngine:
                 head = ":"
             elif direction.is_vertical():
                 head = "\""
-            print(self.term.move_xy(snake_head[0], snake_head[1]) + self.term.on_darkolivegreen(head), end="")
+            print(self.term.move_xy(snake_head.x, snake_head.y) + self.term.on_darkolivegreen(head), end="")
 
     def clear_field(self):
         print(self.term.on_lawngreen(self.term.clear))
@@ -74,14 +75,21 @@ class GameEngine:
         if self.snake.is_out_of_bounds():
             return True
 
-        if self.snake.is_collision():
-            return True
+        # if self.snake.is_self_colliding():
+        #     return True
 
         return False
 
+    def generate_correct_apple_position(self):
+        snake_positions = set(self.snake.body + [self.snake.head])
+        new_position = random_position(self.width - 1, self.height - 1)
+        while new_position in snake_positions:
+            new_position = random_position(self.width - 1, self.height - 1)
+        return new_position
+
     def check_apple(self):
         if self.snake.head == self.apple.position:
-            self.apple.position = random_position(self.width - 1, self.height - 1)
+            self.apple.position = self.generate_correct_apple_position()
             self.snake._new_block = True
 
             self.score += 1

@@ -30,8 +30,8 @@ def parse_args():
         "-v",
         "--vertical",
         type=float,
-        default=1.0,
-        help="Vertical speed multiplier (default: 1.0) (range: 0.1 to 1.0)",
+        default=0.8,
+        help="Vertical speed multiplier (default: 0.8) (range: 0.1 to 1.0)",
     )
 
     subparsers = parser.add_subparsers(title="commands", dest="command")
@@ -48,13 +48,6 @@ def parse_args():
         action="store_true",
         help="Clear all scores"
     )
-    # scores_parser.add_argument(
-    #     "-n",
-    #     "--number",
-    #     type=int,
-    #     default=10,
-    #     help="Number of stored scores (default: 10)"
-    # )
 
     defaults_parser = subparsers.add_parser(
         "defaults",
@@ -87,6 +80,9 @@ def start_game(args):
         return
     if args.length < 2:
         print("Length must be at least 2.")
+        return
+    if args.length > 100:
+        print("Length must not exceed 100.")
         return
     game = GameEngine(fps=args.speed, length=args.length, vertical=args.vertical)
     game.run()

@@ -1,45 +1,32 @@
-import hashlib
 import pathlib
 
 BASE = pathlib.Path(__file__).parent
 file_path = BASE / "high_scores.txt"
 MAX_SCORES = 10
-CHECKSUM_PREFIX = "# "
-
-def compute_checksum(data: str) -> str:
-    return hashlib.sha256(data.encode('UTF-8')).hexdigest()
-
-def compare_checksums(data: str, checksum: str) -> bool:
-    """Compare the computed checksum with the stored checksum."""
-    return compute_checksum(data) == checksum
 
 def load_scores():
     """Read and return the high scores from the file."""
     if not file_path.exists():
-        return []
+        return [], MAX_SCORES
 
-    text = file_path.read_text().splitlines()
+    lines = file_path.read_text().splitlines()
+    if not lines:
+        raise RuntimeError("Invalid high scores file format")
 
-    if not text or not text[-1].startswith(CHECKSUM_PREFIX):
-        print("Invalid high scores file.")
-        return []
+    scores = []
+    for l in lines:
+        try:
+            scores.append(int(l.strip()))
+        except ValueError:
+            continue
 
-    *score_lines, checksum_line = text
-    raw_data = "\n".join(score_lines) + "\n"
-    stored = checksum_line[len(CHECKSUM_PREFIX):].strip()
-    if not compare_checksums(raw_data, stored):
-        print("File checksum mismatch. File has been modified or corrupted.")
-        return []
-
-    return [int(l) for l in score_lines if l.strip().isdigit()]
+    return scores
 
 def save_scores(scores):
     """Save the high scores to the file."""
     top = scores[:MAX_SCORES]
-    scores_text = "\n".join(str(s) for s in top) + "\n"
-    checksum = compute_checksum(scores_text)
-    content = scores_text + CHECKSUM_PREFIX + checksum + "\n"
-    file_path.write_text(content)
+    body = "\n".join(str(s) for s in top)
+    file_path.write_text(body)
 
 def update_scores(new_score):
     """Append a new score to the high scores list and save it."""

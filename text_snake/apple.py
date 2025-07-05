@@ -2,5 +2,10 @@ class Apple:
     def __init__(self, position):
         self.position = position # (x, y) coordinates
 
-    def __getitem__(self, item):
-        return self.position[item]
+    @property
+    def x(self):
+        return self.position.x
+
+    @property
+    def y(self):
+        return self.position.y
