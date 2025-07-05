@@ -10,7 +10,7 @@ The game is built using the `blessed` library, which provides a high-level inter
 ## Features
 
 * **Cross‑platform** – tested on Windows and Ubuntu
-* **Fullscreen** – runs in a terminal window, no GUI required
+* **Works everywhere** – runs in a terminal window, no GUI required
 * **Adjustable** – change the speed, length, and other parameters
 * **High‑scores** – top 10 stored locally
 
