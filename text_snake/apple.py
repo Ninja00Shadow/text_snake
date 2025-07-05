@@ -1,6 +1,6 @@
 class Apple:
     def __init__(self, position):
-        self.position = position # (x, y) coordinates
+        self.position = position
 
     @property
     def x(self):

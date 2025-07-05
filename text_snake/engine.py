@@ -50,14 +50,13 @@ class GameEngine:
 
         with self.term.location(0, 0):
             for segment in snake_body:
-                print(self.term.move_xy(segment.x, segment.y) + self.term.on_darkolivegreen(" "), end="")
+                sys.stdout.write(self.term.move_xy(segment.x, segment.y) + self.term.on_darkolivegreen(" "))
 
-            print(self.term.move_xy(apple.x, apple.y) + self.term.on_red(" "), end="")
+            sys.stdout.write(self.term.move_xy(apple.x, apple.y) + self.term.on_red(" "))
 
             segment_to_remove = self.snake.block_to_remove
             if segment_to_remove:
-                print(self.term.move_xy(segment_to_remove.x, segment_to_remove.y) + self.term.on_lawngreen(" "),
-                      end="")
+                sys.stdout.write(self.term.move_xy(segment_to_remove.x, segment_to_remove.y) + self.term.on_lawngreen(" "))
                 self.snake.block_to_remove = None
 
             head = ""
@@ -66,17 +65,21 @@ class GameEngine:
                 head = ":"
             elif direction.is_vertical():
                 head = "\""
-            print(self.term.move_xy(snake_head.x, snake_head.y) + self.term.on_darkolivegreen(head), end="")
+            sys.stdout.write(self.term.move_xy(snake_head.x, snake_head.y) + self.term.on_darkolivegreen(head))
+
+        sys.stdout.flush()
 
     def clear_field(self):
         print(self.term.on_lawngreen(self.term.clear))
 
     def check_collision(self):
         if self.snake.is_out_of_bounds():
+            logger.debug("Out of bounds collision detected.")
             return True
 
-        # if self.snake.is_self_colliding():
-        #     return True
+        if self.snake.is_self_colliding():
+            logger.debug("Self-collision detected.")
+            return True
 
         return False
 
@@ -116,7 +119,7 @@ class GameEngine:
         self.height = self.term.height
 
         self.snake = Snake(self.start_length, (self.width, self.height))
-        self.apple = Apple(random_position(self.width - 1, self.height - 1))
+        self.apple = Apple(self.generate_correct_apple_position())
         self.clear_field()
         self.print_field()
 

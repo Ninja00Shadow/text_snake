@@ -81,7 +81,7 @@ def start_game(args):
     if args.length < 2:
         print("Length must be at least 2.")
         return
-    if args.length > 100:
+    if args.length > 1000:
         print("Length must not exceed 100.")
         return
     game = GameEngine(fps=args.speed, length=args.length, vertical=args.vertical)

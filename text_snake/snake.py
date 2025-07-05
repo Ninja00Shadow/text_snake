@@ -1,4 +1,5 @@
 import random
+from collections import deque
 
 from text_snake.position import Position
 from text_snake.vector import Vector
@@ -8,7 +9,8 @@ class Snake:
     def __init__(self, length, boundaries):
         self._boundaries = boundaries
 
-        self._body = [self.generate_head()]  # (x, y) coordinates
+        self._body = deque([self.generate_head()]) # (x, y) coordinates
+        self._body_set = set()
         self.generate_body(length - 1)
         self._direction = Vector(0, 0)
 
@@ -21,7 +23,7 @@ class Snake:
 
     @property
     def body(self):
-        return self._body[1:]
+        return list(self._body)[1:]
 
     @property
     def tail(self):
@@ -40,7 +42,6 @@ class Snake:
 
     def generate_body(self, length):
         to_add = length
-        current_body = set(self._body)
 
         while to_add > 0:
             for direction in [Vector(1, 0), Vector(-1, 0), Vector(0, 1), Vector(0, -1)]:
@@ -49,26 +50,25 @@ class Snake:
                 is_out_of_bounds = new_segment.x < 0 or new_segment.x >= self._boundaries[
                     0] or new_segment.y < 0 or new_segment.y >= self._boundaries[1]
 
-                if not (is_out_of_bounds or new_segment in current_body):
+                if not (is_out_of_bounds or new_segment in self._body_set):
                     self._body.append(new_segment)
-                    current_body.add(new_segment)
+                    self._body_set.add(new_segment)
                     to_add -= 1
                     break
 
 
-    # TODO: Performance
     def move(self):
         if self._direction != Vector(0, 0):
-            if self._new_block:
-                new_head = self.head + self._direction
-                self._body.insert(0, new_head)
+            new_head = self.head + self._direction
+            self._body_set.add(self.head)
+            self._body.appendleft(new_head)
 
+            if self._new_block:
                 self._new_block = False
             else:
-                self.block_to_remove = self.tail
-                new_head = self.head + self._direction
-                self._body.insert(0, new_head)
-                self._body.pop()
+                tail = self._body.pop()
+                self.block_to_remove = tail
+                self._body_set.remove(tail)
         else:
             pass
 
@@ -88,9 +88,8 @@ class Snake:
         return self.head.x < 0 or self.head.x >= self._boundaries[0] or self.head.y < 0 or self.head.y >= \
             self._boundaries[1]
 
-    # TODO: Performance
     def is_self_colliding(self):
-        return self.head in self.body
+        return self.head in self._body_set
 
     def __len__(self):
         return len(self._body)
