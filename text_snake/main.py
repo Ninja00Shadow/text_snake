@@ -81,7 +81,7 @@ def start_game(args):
     if args.length < 2:
         print("Length must be at least 2.")
         return
-    if args.length > 1000:
+    if args.length > 100:
         print("Length must not exceed 100.")
         return
     game = GameEngine(fps=args.speed, length=args.length, vertical=args.vertical)
@@ -102,6 +102,9 @@ def handle_defaults(args):
     if args.length is not None:
         if args.length < 2:
             print("Length must be at least 2.")
+            return
+        if args.length > 100:
+            print("Length must not exceed 100.")
             return
         defaults["length"] = args.length
 
