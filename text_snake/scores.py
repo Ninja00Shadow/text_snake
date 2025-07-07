@@ -7,7 +7,7 @@ MAX_SCORES = 10
 def load_scores():
     """Read and return the high scores from the file."""
     if not file_path.exists():
-        return [], MAX_SCORES
+        return []
 
     lines = file_path.read_text().splitlines()
     if not lines:
